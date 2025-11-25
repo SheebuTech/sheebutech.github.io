@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="description" content="Sarkari Result Photo Resizer – Resize Photo, Signature & Documents for SSC, Railway, UPSC, JEE, NEET, PAN Card. CM to Pixels, Reduce KB, 100% Safe & Offline.">
+    <meta name="keywords" content="Sarkari Result Photo Resizer, SSC Photo Maker, Railway Photo Size, UPSC Photo Size, NEET Photo Resize, JEE Photo Resize, Online Signature Resizer, Reduce Image Size in KB, Sarkari Form Tools, SheebuTech">
+    <meta name="author" content="SheebuTech">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="manifest" href="manifest.json">
+
+    <meta property="og:title" content="SheebuTech - Sarkari Form Tools">
+    <meta property="og:description" content="Resize and Edit Photos for Government Jobs Offline. 100% Safe.">
+    <meta property="og:type" content="website">
+
+    <title>SheebuTech — Free Photo & PDF Tools (100% Safe, Offline)</title>
+    
+    <style>
+        /* --- 1. MODERN CSS VARIABLES --- */
+        :root {
+            --primary: #2563eb;       /* Royal Blue */
+            --primary-dark: #1e40af;
+            --secondary: #f1f5f9;     /* Light Gray */
+            --text-main: #0f172a;     /* Dark Navy */
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --white: #ffffff;
+            --success: #16a34a;       /* Green */
+            --warning: #d97706;       /* Orange */
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 12px;
+        }
+
+        /* DARK MODE OVERRIDES */
+        body.dark {
+            --primary: #38bdf8;
+            --primary-dark: #0ea5e9;
+            --secondary: #020617;
+            --text-main: #e5e7eb;
+            --text-muted: #94a3b8;
+            --border: #1e293b;
+            --white: #020617;
+            --success: #22c55e;
+            --warning: #f97316;
+            background-color: #020617;
+            color: var(--text-main);
+        }
+
+        /* --- 2. RESET & BASE STYLES --- */
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8fafc;
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            padding-bottom: 80px;
+        }
+
+        /* --- 3. ACCESSIBLE HEADER --- */
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+            padding: 16px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .header-text {
+            flex: 1;
+            text-align: left;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.05rem;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        header p {
+            margin: 4px 0 0;
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        #theme-toggle {
+            border: none;
+            border-radius: 999px;
+            padding: 8px 14px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: rgba(15, 23, 42, 0.9);
+            color: #e5e7eb;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        /* --- 4. NAVIGATION TABS --- */
+        nav.tabs {
+            display: flex;
+            background: var(--white);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            background: transparent;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            white-space: nowrap;
+        }
+
+        .tab-btn:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: -2px;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background-color: #eff6ff;
+        }
+
+        /* --- 5. MAIN CONTAINER --- */
+        main.container {
+            padding: 20px 16px;
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        section.tool-section {
+            display: none;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        section.tool-section.active {
+            display: block;
+        }
+
+        /* --- 6. CARDS & UPLOAD AREA --- */
+        .card {
+            background: var(--white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 24px;
+            border: 1px solid var(--border);
+        }
+
+        .upload-box {
+            border: 2px dashed var(--primary);
+            background-color: #eff6ff;
+            border-radius: var(--radius);
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+            margin-bottom: 24px;
+        }
+
+        .upload-box:active, .upload-box:hover {
+            background-color: #dbeafe;
+        }
+
+        .upload-box.drag-over {
+            background-color: #dbeafe;
+            border-style: solid;
+        }
+
+        .upload-box p {
+            margin: 0;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        /* --- 7. FORMS & INPUTS --- */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-main);
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            align-items: center;
+        }
+
+        input[type="number"], 
+        input[type="text"], 
+        select {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: var(--white);
+            color: var(--text-main);
+            appearance: none;
+        }
+
+        input[type="number"]:focus, 
+        input[type="text"]:focus, 
+        select:focus {
+            outline: 2px solid var(--primary);
+            border-color: transparent;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: #cbd5e1;
+            border-radius: 5px;
+            outline: none;
+            margin: 16px 0;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* --- 8. UTILITY BOXES --- */
+        .converter-box {
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+        .converter-box h4 {
+            margin: 0 0 12px 0;
+            color: #92400e;
+            font-size: 0.95rem;
+        }
+        .btn-small {
+            padding: 14px;
+            background: var(--warning);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            width: 100%;
+        }
+
+        /* --- 9. ACTION BUTTONS --- */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            transition: transform 0.1s;
+            margin-top: 10px;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-download {
+            background-color: var(--success);
+            color: white;
+            box-shadow: 0 4px 6px rgba(22, 163, 74, 0.3);
+        }
+
+        /* --- 10. PREVIEW --- */
+        .preview-wrapper {
+            margin-top: 24px;
+            padding: 16px;
+            background: var(--secondary);
+            border-radius: var(--radius);
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .preview-img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background: white;
+        }
+
+        .size-badge {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 6px 12px;
+            background: #e0e7ff;
+            color: var(--primary-dark);
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        /* --- CROP CANVAS --- */
+        #p-crop-wrapper {
+            margin-top: 8px;
+        }
+
+        #p-crop-canvas {
+            width: 100%;
+            max-width: 320px;
+            height: auto;
+            border-radius: 8px;
+            border: 1px dashed var(--border);
+            touch-action: none;
+        }
+
+        .crop-hint {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* --- 11. FOOTER --- */
+        footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            margin-top: 40px;
+            font-size: 0.85rem;
+        }
+
+        .sheebu-brand {
+            display: inline-block;
+            background: #1e293b;
+            color: #4ade80;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        footer a { color: var(--primary); text-decoration: none; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+
+        /* Instructions section */
+        .info-section h2 {
+            margin-top: 0;
+            font-size: 1rem;
+        }
+        .info-section ol {
+            padding-left: 1.2rem;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header role="banner">
+        <div class="header-text">
+            <h1>SheebuTech — Free Photo & PDF Tools</h1>
+            <p>100% Safe, Offline & Secure</p>
+        </div>
+        <button id="theme-toggle" type="button" aria-label="Toggle Dark Mode">
+            🌙 Dark
+        </button>
+    </header>
+
+    <nav class="tabs" role="tablist">
+        <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="photo-panel" id="tab-photo">Photo</button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="sign-panel" id="tab-sign">Signature</button>
+        <button class="tab-btn" role="tab" aria-selected="false" aria-controls="docs-panel" id="tab-docs">Document</button>
+    </nav>
+
+    <main class="container">
+
+        <section id="photo-panel" class="tool-section active" role="tabpanel" aria-labelledby="tab-photo">
+            <div class="card">
+                <div class="upload-box" id="p-upload-trigger" tabindex="0" role="button" aria-label="Upload Photo">
+                    <p>📷 फोटो अपलोड करें (Tap Here या Drag & Drop)</p>
+                    <input type="file" id="p-input" hidden accept="image/*">
+                </div>
+
+                <div id="p-controls" style="display:none;">
+
+                    <!-- Exam Presets -->
+                    <div class="input-group">
+                        <label for="p-preset">Exam Preset (Optional)</label>
+                        <select id="p-preset">
+                            <option value="">Manual Size / Custom</option>
+                            <option value="ssc">SSC / Railway / UP Police</option>
+                            <option value="upsc">UPSC</option>
+                            <option value="jee">JEE Main / Advanced</option>
+                            <option value="neet">NEET</option>
+                            <option value="pancard">PAN Card</option>
+                            <option value="passport">Passport Size</option>
+                        </select>
+                        <p class="crop-hint">Preset चुनते ही CM और Pixels अपने आप सेट हो जाएंगे।</p>
+                    </div>
+                    
+                    <div class="converter-box">
+                        <h4>📏 CM to Pixel Converter (Govt Forms)</h4>
+                        <div class="row" style="grid-template-columns: 1fr 1fr auto;">
+                            <input type="number" id="cm-w" placeholder="W (cm)" aria-label="Width in CM">
+                            <input type="number" id="cm-h" placeholder="H (cm)" aria-label="Height in CM">
+                            <button id="btn-convert-cm" class="btn-small">Set</button>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Target Size (Pixels)</label>
+                        <div class="row">
+                            <input type="number" id="p-w" placeholder="Width">
+                            <input type="number" id="p-h" placeholder="Height">
+                        </div>
+                        <label style="font-weight: normal; font-size: 0.9rem; margin-top: 10px; display:flex; align-items:center; gap:8px;">
+                            <input type="checkbox" id="p-ratio" checked style="width:20px; height:20px; margin:0;"> 
+                            <span>Lock Aspect Ratio (चेहरा पिचकेगा नहीं)</span>
+                        </label>
+                    </div>
+
+                    <!-- Crop Tool -->
+                    <div class="input-group">
+                        <label style="display:flex; align-items:center; gap:8px; font-weight:600;">
+                            <input type="checkbox" id="p-crop-enable" style="width:20px; height:20px; margin:0;">
+                            <span>Manual Crop (Face Area चुनें)</span>
+                        </label>
+                        <div id="p-crop-wrapper" style="display:none;">
+                            <canvas id="p-crop-canvas" width="280" height="280"></canvas>
+                            <p class="crop-hint">Square box को drag करके चेहरा ठीक से set करें। Process Photo दबाने पर यही हिस्सा resize होगा.</p>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="p-bright">☀️ Brightness: <span id="p-bright-val">100</span>%</label>
+                        <input type="range" id="p-bright" min="50" max="150" value="100">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="p-qual">📉 Quality (Reduce KB): <span id="p-qual-val">80</span>%</label>
+                        <input type="range" id="p-qual" min="10" max="100" value="80">
+                    </div>
+
+                    <div class="input-group">
+                        <label for="p-filename">Filename (Optional)</label>
+                        <input type="text" id="p-filename" placeholder="Ex: Sheebu_SSC_Photo">
+                    </div>
+
+                    <button class="btn btn-primary" id="btn-process-photo">⚡ Process Photo</button>
+                    
+                    <div class="preview-wrapper" id="p-preview-box" style="display:none;">
+                        <img id="p-preview" class="preview-img" alt="Processed Photo Preview">
+                        <div id="p-size-display" class="size-badge"></div>
+                        <a id="p-download" class="btn btn-download" download>⬇️ Download Photo</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="sign-panel" class="tool-section" role="tabpanel" aria-labelledby="tab-sign">
+            <div class="card">
+                <div class="upload-box" id="s-upload-trigger" tabindex="0" role="button" aria-label="Upload Signature">
+                    <p>✒️ साइन अपलोड करें (Tap Here या Drag & Drop)</p>
+                    <input type="file" id="s-input" hidden accept="image/*">
+                </div>
+
+                <div id="s-controls" style="display:none;">
+                    <div class="input-group">
+                        <label for="s-contrast">✨ Magic White (Remove Background)</label>
+                        <input type="range" id="s-contrast" min="100" max="300" value="150">
+                        <p style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">काले बैकग्राउंड को हटाने के लिए स्लाइडर बढ़ाएं।</p>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Dimensions (Px)</label>
+                        <div class="row">
+                            <input type="number" id="s-w" placeholder="Width" value="200">
+                            <input type="number" id="s-h" placeholder="Height" value="100">
+                        </div>
+                    </div>
+
+                    <div class="preview-wrapper">
+                        <p style="margin-top:0; font-size:0.8rem; color:#666;">Live Preview:</p>
+                        <img id="s-preview" class="preview-img" style="display:none;" alt="Signature Preview">
+                    </div>
+
+                    <button class="btn btn-primary" id="btn-process-sign">⚡ Clean & Save</button>
+                    
+                    <a id="s-download" class="btn btn-download" style="display:none; margin-top:15px;" download>⬇️ Download Clean Signature</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="docs-panel" class="tool-section" role="tabpanel" aria-labelledby="tab-docs">
+            <div class="card">
+                <div class="upload-box" id="d-upload-trigger" tabindex="0" role="button" aria-label="Upload Document">
+                    <p>📄 डॉक्यूमेंट अपलोड करें (Aadhar/Marksheet)</p>
+                    <input type="file" id="d-input" hidden accept="image/*">
+                </div>
+
+                <div id="d-controls" style="display:none;">
+                    <div class="input-group">
+                        <label for="d-mode">Select Filter</label>
+                        <select id="d-mode">
+                            <option value="original">Original (No Change)</option>
+                            <option value="bw">Black & White (Best for Text)</option>
+                            <option value="magic">Magic Contrast (Dark Ink)</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="d-qual">Compression Level</label>
+                        <input type="range" id="d-qual" min="10" max="90" value="60">
+                    </div>
+
+                    <button class="btn btn-primary" id="btn-process-doc">⚡ Process Document</button>
+                    
+                    <div class="preview-wrapper" id="d-res-box" style="display:none;">
+                         <img id="d-preview" class="preview-img" alt="Document Preview">
+                         <div id="d-size-display" class="size-badge"></div>
+                         <a id="d-download" class="btn btn-download" download>⬇️ Download Document</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Instructions Section -->
+        <section class="info-section" aria-label="How to Use SheebuTech Tools" style="margin-top:24px;">
+            <div class="card">
+                <h2>कैसे इस्तेमाल करें? (Simple Steps)</h2>
+                <ol>
+                    <li>सबसे पहले ऊपर से <strong>Photo / Signature / Document</strong> टैब चुनें।</li>
+                    <li><strong>Upload</strong> पर टैप करें (या PC हो तो drag & drop करें).</li>
+                    <li>Photo के लिए:
+                        <ul>
+                            <li>चाहें तो <strong>Exam Preset</strong> चुनें (SSC / NEET / PAN आदि).</li>
+                            <li>Size CM या Pixels में देख कर confirm करें.</li>
+                            <li>यदि ज़रूरत हो तो <strong>Manual Crop</strong> on करके चेहरा box में set करें.</li>
+                            <li>Brightness और Quality सेट करें.</li>
+                        </ul>
+                    </li>
+                    <li>Signature के लिए Magic White slider use करके background साफ करें।</li>
+                    <li>Document के लिए Filter चुनें (Black & White / Magic Contrast) और compression level सेट करें.</li>
+                    <li>अंत में <strong>Process</strong> दबाएं और नीचे से <strong>Download</strong> करें.</li>
+                </ol>
+            </div>
+        </section>
+
+    </main>
+
+    <footer role="contentinfo">
+        <span class="sheebu-brand">Dev: SheebuTech</span>
+        <p>Built for India 🇮🇳 | 100% Privacy</p>
+        <p>Need Help? <a href="mailto:sheebutechofficial@gmail.com">sheebutechofficial@gmail.com</a></p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- STATE MANAGEMENT ---
+            const state = {
+                photo: { img: new Image(), loaded: false, canvasScale: 1, offsetX: 0, offsetY: 0 },
+                sign: { img: new Image(), loaded: false },
+                doc: { img: new Image(), loaded: false }
+            };
+
+            const el = (id) => document.getElementById(id);
+            const formatKB = (bytes) => (bytes / 1024).toFixed(1) + ' KB';
+
+            // --- DARK MODE TOGGLE ---
+            const themeToggle = el('theme-toggle');
+            const themeMeta = document.querySelector('meta[name="theme-color"]');
+            const applyTheme = (mode) => {
+                if (mode === 'dark') {
+                    document.body.classList.add('dark');
+                    themeToggle.textContent = '☀️ Light';
+                    themeMeta.setAttribute('content', '#020617');
+                } else {
+                    document.body.classList.remove('dark');
+                    themeToggle.textContent = '🌙 Dark';
+                    themeMeta.setAttribute('content', '#2563eb');
+                }
+            };
+            const storedTheme = localStorage.getItem('sheebu-theme');
+            applyTheme(storedTheme === 'dark' ? 'dark' : 'light');
+
+            themeToggle.addEventListener('click', () => {
+                const isDark = document.body.classList.toggle('dark');
+                localStorage.setItem('sheebu-theme', isDark ? 'dark' : 'light');
+                applyTheme(isDark ? 'dark' : 'light');
+            });
+
+            // --- TAB NAVIGATION ---
+            const tabs = document.querySelectorAll('.tab-btn');
+            const sections = document.querySelectorAll('.tool-section');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    tabs.forEach(t => {
+                        t.classList.remove('active');
+                        t.setAttribute('aria-selected', 'false');
+                    });
+                    sections.forEach(s => s.classList.remove('active'));
+
+                    const targetId = e.target.id === 'tab-photo' ? 'photo-panel' : 
+                                     e.target.id === 'tab-sign' ? 'sign-panel' : 'docs-panel';
+                    
+                    e.target.classList.add('active');
+                    e.target.setAttribute('aria-selected', 'true');
+                    document.getElementById(targetId).classList.add('active');
+                });
+            });
+
+            // --- HELPER: Drag & Drop setup ---
+            const setupDropZone = (zoneId, inputId, fileHandler) => {
+                const zone = el(zoneId);
+                const input = el(inputId);
+
+                zone.addEventListener('click', () => input.click());
+                zone.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') input.click();
+                });
+
+                zone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    zone.classList.add('drag-over');
+                });
+
+                zone.addEventListener('dragleave', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('drag-over');
+                });
+
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('drag-over');
+                    const file = e.dataTransfer.files && e.dataTransfer.files[0];
+                    if (file) fileHandler(file);
+                });
+
+                input.addEventListener('change', (e) => {
+                    if (e.target.files && e.target.files[0]) {
+                        fileHandler(e.target.files[0]);
+                    }
+                });
+            };
+
+            const ensureImageFile = (file) => {
+                if (!file.type || !file.type.startsWith('image/')) {
+                    alert('Sirf image file upload karein (JPG/PNG etc).');
+                    return false;
+                }
+                return true;
+            };
+
+            // --- EXAM PRESETS MAP ---
+            const examPresets = {
+                'ssc':     { cmW: 3.5, cmH: 4.5 },
+                'upsc':    { cmW: 3.5, cmH: 4.5 },
+                'jee':     { cmW: 3.5, cmH: 4.5 },
+                'neet':    { cmW: 3.5, cmH: 4.5 },
+                'pancard': { cmW: 2.5, cmH: 3.5 },
+                'passport':{ cmW: 3.5, cmH: 4.5 }
+            };
+
+            const cmToPx = (cm) => Math.round(cm * 37.8);
+
+            // --- 1. PHOTO LOGIC ---
+            const loadPhotoFile = (file) => {
+                if (!ensureImageFile(file)) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    state.photo.img = new Image();
+                    state.photo.img.onload = () => {
+                        state.photo.loaded = true;
+                        el('p-controls').style.display = 'block';
+                        el('p-w').value = state.photo.img.width;
+                        el('p-h').value = state.photo.img.height;
+                        setupInitialCrop();
+                    };
+                    state.photo.img.src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+            };
+
+            setupDropZone('p-upload-trigger', 'p-input', loadPhotoFile);
+
+            // CM Converter
+            el('btn-convert-cm').addEventListener('click', () => {
+                const cmW = parseFloat(el('cm-w').value);
+                const cmH = parseFloat(el('cm-h').value);
+                if(cmW && cmH) {
+                    el('p-w').value = cmToPx(cmW);
+                    el('p-h').value = cmToPx(cmH);
+                } else {
+                    alert('Please enter Width and Height in CM');
+                }
+            });
+
+            // Exam preset change
+            el('p-preset').addEventListener('change', (e) => {
+                const val = e.target.value;
+                if (!val || !examPresets[val]) return;
+                const preset = examPresets[val];
+                el('cm-w').value = preset.cmW;
+                el('cm-h').value = preset.cmH;
+                el('p-w').value = cmToPx(preset.cmW);
+                el('p-h').value = cmToPx(preset.cmH);
+            });
+
+            // Aspect Ratio Lock
+            el('p-w').addEventListener('input', (e) => {
+                if(el('p-ratio').checked && state.photo.loaded) {
+                    const ratio = state.photo.img.height / state.photo.img.width;
+                    const newW = parseInt(e.target.value) || state.photo.img.width;
+                    el('p-h').value = Math.round(newW * ratio);
+                }
+            });
+
+            // Live range updates
+            el('p-qual').addEventListener('input', (e) => el('p-qual-val').textContent = e.target.value);
+            el('p-bright').addEventListener('input', (e) => el('p-bright-val').textContent = e.target.value);
+
+            // --- Crop Canvas Logic ---
+            const cropEnable = el('p-crop-enable');
+            const cropWrapper = el('p-crop-wrapper');
+            const cropCanvas = el('p-crop-canvas');
+            const cropCtx = cropCanvas.getContext('2d');
+            let cropRect = { x: 40, y: 40, w: 200, h: 200 };
+            let dragging = false;
+            let dragOffset = { x: 0, y: 0 };
+
+            const setupInitialCrop = () => {
+                const cw = cropCanvas.width;
+                const ch = cropCanvas.height;
+                const size = Math.min(cw, ch) * 0.7;
+                cropRect.w = cropRect.h = size;
+                cropRect.x = (cw - size) / 2;
+                cropRect.y = (ch - size) / 2;
+                if (cropEnable.checked) drawCropCanvas();
+            };
+
+            const drawCropCanvas = () => {
+                if (!state.photo.loaded) return;
+                const img = state.photo.img;
+                const cw = cropCanvas.width;
+                const ch = cropCanvas.height;
+
+                cropCtx.clearRect(0, 0, cw, ch);
+
+                const scale = Math.min(cw / img.width, ch / img.height);
+                const imgW = img.width * scale;
+                const imgH = img.height * scale;
+                const offsetX = (cw - imgW) / 2;
+                const offsetY = (ch - imgH) / 2;
+
+                state.photo.canvasScale = scale;
+                state.photo.offsetX = offsetX;
+                state.photo.offsetY = offsetY;
+
+                cropCtx.drawImage(img, offsetX, offsetY, imgW, imgH);
+
+                cropCtx.fillStyle = 'rgba(0,0,0,0.5)';
+                cropCtx.fillRect(0, 0, cw, ch);
+                cropCtx.clearRect(cropRect.x, cropRect.y, cropRect.w, cropRect.h);
+
+                cropCtx.strokeStyle = '#22c55e';
+                cropCtx.lineWidth = 2;
+                cropCtx.strokeRect(cropRect.x, cropRect.y, cropRect.w, cropRect.h);
+            };
+
+            cropEnable.addEventListener('change', () => {
+                if (cropEnable.checked) {
+                    cropWrapper.style.display = 'block';
+                    setupInitialCrop();
+                    drawCropCanvas();
+                } else {
+                    cropWrapper.style.display = 'none';
+                }
+            });
+
+            const isInRect = (x, y) => {
+                return x >= cropRect.x && x <= cropRect.x + cropRect.w &&
+                       y >= cropRect.y && y <= cropRect.y + cropRect.h;
+            };
+
+            cropCanvas.addEventListener('pointerdown', (e) => {
+                if (!cropEnable.checked || !state.photo.loaded) return;
+                const rect = cropCanvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                if (isInRect(x, y)) {
+                    dragging = true;
+                    dragOffset.x = x - cropRect.x;
+                    dragOffset.y = y - cropRect.y;
+                    cropCanvas.setPointerCapture(e.pointerId);
+                }
+            });
+
+            cropCanvas.addEventListener('pointermove', (e) => {
+                if (!dragging) return;
+                const rect = cropCanvas.getBoundingClientRect();
+                let x = e.clientX - rect.left - dragOffset.x;
+                let y = e.clientY - rect.top - dragOffset.y;
+                // Bounds
+                x = Math.max(0, Math.min(x, cropCanvas.width - cropRect.w));
+                y = Math.max(0, Math.min(y, cropCanvas.height - cropRect.h));
+                cropRect.x = x;
+                cropRect.y = y;
+                drawCropCanvas();
+            });
+
+            cropCanvas.addEventListener('pointerup', (e) => {
+                dragging = false;
+                cropCanvas.releasePointerCapture(e.pointerId);
+            });
+
+            cropCanvas.addEventListener('pointercancel', (e) => {
+                dragging = false;
+                cropCanvas.releasePointerCapture(e.pointerId);
+            });
+
+            // Process Photo
+            el('btn-process-photo').addEventListener('click', () => {
+                if(!state.photo.loaded) {
+                    alert('Pehle photo upload karein.');
+                    return;
+                }
+                
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                const w = parseInt(el('p-w').value) || state.photo.img.width;
+                const h = parseInt(el('p-h').value) || state.photo.img.height;
+                
+                canvas.width = w;
+                canvas.height = h;
+
+                const img = state.photo.img;
+
+                // Apply Filters
+                const bright = el('p-bright').value;
+                ctx.filter = `brightness(${bright}%)`;
+
+                if (cropEnable.checked) {
+                    const scale = state.photo.canvasScale || 1;
+                    const offsetX = state.photo.offsetX || 0;
+                    const offsetY = state.photo.offsetY || 0;
+
+                    let sx = (cropRect.x - offsetX) / scale;
+                    let sy = (cropRect.y - offsetY) / scale;
+                    let sw = cropRect.w / scale;
+                    let sh = cropRect.h / scale;
+
+                    // Clamp source rect inside image
+                    sx = Math.max(0, sx);
+                    sy = Math.max(0, sy);
+                    if (sx + sw > img.width) sw = img.width - sx;
+                    if (sy + sh > img.height) sh = img.height - sy;
+
+                    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, w, h);
+                } else {
+                    ctx.drawImage(img, 0, 0, w, h);
+                }
+
+                const quality = parseInt(el('p-qual').value) / 100;
+                const dataUrl = canvas.toDataURL('image/jpeg', quality);
+
+                // Show Results
+                el('p-preview-box').style.display = 'block';
+                el('p-preview').src = dataUrl;
+
+                const head = 'data:image/jpeg;base64,';
+                const size = Math.round((dataUrl.length - head.length) * 3/4);
+                el('p-size-display').textContent = `Est. Size: ${formatKB(size)}`;
+
+                const dlBtn = el('p-download');
+                let name = el('p-filename').value.trim() || "SheebuTech_Photo";
+                if(!name.toLowerCase().endsWith('.jpg')) name += ".jpg";
+                
+                dlBtn.href = dataUrl;
+                dlBtn.download = name;
+            });
+
+
+            // --- 2. SIGNATURE LOGIC ---
+            const loadSignFile = (file) => {
+                if (!ensureImageFile(file)) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    state.sign.img = new Image();
+                    state.sign.img.onload = () => {
+                        state.sign.loaded = true;
+                        el('s-controls').style.display = 'block';
+                        el('s-preview').style.display = 'block';
+                        el('s-preview').src = state.sign.img.src;
+                        updateSignPreview();
+                    };
+                    state.sign.img.src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+            };
+
+            setupDropZone('s-upload-trigger', 's-input', loadSignFile);
+
+            const updateSignPreview = () => {
+                if(state.sign.loaded) {
+                    const val = el('s-contrast').value;
+                    el('s-preview').style.filter = `contrast(${val}%) grayscale(100%)`;
+                }
+            };
+            el('s-contrast').addEventListener('input', updateSignPreview);
+
+            el('btn-process-sign').addEventListener('click', () => {
+                if(!state.sign.loaded) {
+                    alert('Pehle signature upload karein.');
+                    return;
+                }
+                
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                const w = parseInt(el('s-w').value) || 200;
+                const h = parseInt(el('s-h').value) || 100;
+                
+                canvas.width = w;
+                canvas.height = h;
+                
+                const cont = el('s-contrast').value;
+                ctx.filter = `contrast(${cont}%) grayscale(100%)`;
+                
+                ctx.drawImage(state.sign.img, 0, 0, w, h);
+                
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                
+                el('s-preview').src = dataUrl;
+                el('s-preview').style.filter = 'none';
+                
+                const dlBtn = el('s-download');
+                dlBtn.href = dataUrl;
+                dlBtn.download = `Sign_SheebuTech_${Date.now()}.jpg`;
+                dlBtn.style.display = 'block';
+                dlBtn.textContent = "⬇️ Download Clean Signature";
+            });
+
+
+            // --- 3. DOCS LOGIC ---
+            const loadDocFile = (file) => {
+                if (!ensureImageFile(file)) return;
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    state.doc.img = new Image();
+                    state.doc.img.onload = () => {
+                        state.doc.loaded = true;
+                        el('d-controls').style.display = 'block';
+                    };
+                    state.doc.img.src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+            };
+
+            setupDropZone('d-upload-trigger', 'd-input', loadDocFile);
+
+            el('btn-process-doc').addEventListener('click', () => {
+                if(!state.doc.loaded) {
+                    alert('Pehle document upload karein.');
+                    return;
+                }
+
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                canvas.width = state.doc.img.width;
+                canvas.height = state.doc.img.height;
+                
+                const mode = el('d-mode').value;
+                
+                if(mode === 'bw') ctx.filter = "grayscale(100%) contrast(120%)";
+                else if(mode === 'magic') ctx.filter = "contrast(140%) brightness(105%)";
+                else ctx.filter = "none";
+                
+                ctx.drawImage(state.doc.img, 0, 0);
+                
+                const quality = parseInt(el('d-qual').value) / 100;
+                const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                
+                el('d-res-box').style.display = 'block';
+                el('d-preview').src = dataUrl;
+                
+                const head = 'data:image/jpeg;base64,';
+                const size = Math.round((dataUrl.length - head.length) * 3/4);
+                el('d-size-display').textContent = `Size: ${formatKB(size)}`;
+                
+                const dlBtn = el('d-download');
+                dlBtn.href = dataUrl;
+                dlBtn.download = `Doc_SheebuTech_${Date.now()}.jpg`;
+            });
+
+            // --- PWA SERVICE WORKER ---
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('service-worker.js').catch(() => {});
+            }
+
+        });
+    </script>
+</body>
+</html>
