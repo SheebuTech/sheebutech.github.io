@@ -1,605 +1,536 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SheebuTech Pro — Ultimate Student Tools</title>
-    <meta name="description" content="Photo Resizer, Image to PDF, and PDF Merger by SheebuTech.">
+    <title>SheebuTech Ultra — Student Tools</title>
     <meta name="theme-color" content="#0f172a">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* --- 1. MODERN VARIABLES & THEME --- */
         :root {
-            --bg-body: #0f172a;       /* Deep Navy */
-            --bg-card: rgba(30, 41, 59, 0.7); /* Glass Effect */
-            --primary: #38bdf8;       /* Electric Blue */
-            --primary-glow: rgba(56, 189, 248, 0.4);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border: rgba(255, 255, 255, 0.1);
-            --success: #22c55e;
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --accent: #06b6d4;
+            --text-light: #f1f5f9;
+            --text-gray: #94a3b8;
+            --border: rgba(255,255,255,0.08);
             --radius: 16px;
-            --font-main: system-ui, -apple-system, sans-serif;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Segoe UI', sans-serif; }
 
         body {
-            font-family: var(--font-main);
-            background: var(--bg-body);
-            background-image: radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.1) 0%, transparent 20%),
-                              radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 20%);
-            color: var(--text-main);
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            padding-bottom: 80px;
+            margin: 0; padding: 0;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            padding-bottom: 90px; /* Space for bottom nav */
+            overflow-x: hidden;
         }
 
-        /* --- 2. HEADER & BRANDING --- */
-        header {
+        /* --- HEADER --- */
+        .app-header {
             padding: 20px;
-            text-align: center;
+            background: rgba(15, 23, 42, 0.9);
             backdrop-filter: blur(10px);
+            position: sticky; top: 0; z-index: 50;
             border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(15, 23, 42, 0.85);
+            display: flex; align-items: center; justify-content: space-between;
         }
+        .logo { font-size: 1.4rem; font-weight: 800; background: linear-gradient(to right, var(--primary), var(--accent)); -webkit-background-clip: text; color: transparent; }
+        .status-badge { font-size: 0.7rem; background: rgba(34, 197, 94, 0.15); color: #22c55e; padding: 4px 8px; border-radius: 20px; border: 1px solid rgba(34, 197, 94, 0.3); }
 
-        .brand-logo {
-            font-size: 1.5rem;
-            font-weight: 800;
-            background: linear-gradient(to right, #38bdf8, #818cf8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            letter-spacing: -0.5px;
+        /* --- BOTTOM NAV (App Like) --- */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(15px);
+            border-top: 1px solid var(--border);
+            display: flex; justify-content: space-around;
+            padding: 10px 5px; z-index: 100;
         }
-
-        .tagline { font-size: 0.85rem; color: var(--text-muted); margin-top: 4px; }
-
-        /* --- 3. NAVIGATION TABS (Scrollable) --- */
-        .tabs-wrapper {
-            overflow-x: auto;
-            padding: 15px 0;
-            /* Hide scrollbar */
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center;
+            color: var(--text-gray); font-size: 0.75rem;
+            background: none; border: none; cursor: pointer;
+            transition: 0.3s;
         }
-        .tabs-wrapper::-webkit-scrollbar { display: none; }
+        .nav-item i { font-size: 1.3rem; margin-bottom: 4px; }
+        .nav-item.active { color: var(--primary); transform: translateY(-3px); }
 
-        .tabs-container {
-            display: flex;
-            justify-content: start;
-            padding: 0 15px;
-            gap: 10px;
-            min-width: max-content;
-        }
+        /* --- MAIN CONTENT --- */
+        .container { max-width: 600px; margin: 0 auto; padding: 20px 15px; }
 
-        .tab-btn {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text-muted);
-            padding: 10px 20px;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-        }
+        .tool-panel { display: none; animation: fadeIn 0.3s ease; }
+        .tool-panel.active { display: block; }
 
-        .tab-btn.active {
-            background: var(--primary);
-            color: #000;
-            border-color: var(--primary);
-            box-shadow: 0 0 15px var(--primary-glow);
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- 4. MAIN CARD DESIGN --- */
-        .container { max-width: 600px; margin: 0 auto; padding: 0 15px; }
-
-        .tool-section {
-            display: none;
-            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .tool-section.active { display: block; }
-
+        /* --- CARDS & INPUTS --- */
         .card {
-            background: var(--bg-card);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 24px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            margin-bottom: 24px;
+            background: var(--card-bg); border-radius: var(--radius);
+            padding: 20px; border: 1px solid var(--border);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
         }
 
-        /* --- 5. UPLOAD ZONE --- */
-        .upload-zone {
+        .section-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; }
+        .section-title i { color: var(--accent); }
+
+        .input-group { margin-bottom: 15px; }
+        .label { display: block; color: var(--text-gray); font-size: 0.85rem; margin-bottom: 8px; }
+        
+        input, select {
+            width: 100%; background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border);
+            padding: 12px; border-radius: 10px;
+            color: white; font-size: 1rem;
+            transition: 0.2s;
+        }
+        input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
+
+        /* --- UPLOAD BOX --- */
+        .upload-box {
             border: 2px dashed var(--border);
             border-radius: var(--radius);
-            padding: 40px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
+            padding: 30px; text-align: center;
             background: rgba(255,255,255,0.02);
-            position: relative;
+            cursor: pointer; position: relative;
+            transition: 0.3s;
         }
-        .upload-zone:hover, .upload-zone:active {
-            border-color: var(--primary);
-            background: rgba(56, 189, 248, 0.05);
-        }
-        .upload-icon { font-size: 2.5rem; margin-bottom: 10px; display: block; }
-        .upload-text { font-weight: 600; color: var(--primary); }
-        .file-count { font-size: 0.8rem; color: var(--success); margin-top: 5px; display: none;}
+        .upload-box:active { background: rgba(59, 130, 246, 0.1); border-color: var(--primary); }
+        .file-info { margin-top: 10px; font-size: 0.85rem; color: var(--accent); font-weight: 600; }
 
-        /* --- 6. CONTROLS --- */
-        .control-group { margin-bottom: 20px; }
-        .control-label {
-            display: flex; justify-content: space-between;
-            font-size: 0.9rem; margin-bottom: 8px; color: var(--text-muted);
-        }
-        
-        input[type="number"], select, input[type="text"] {
-            width: 100%;
-            padding: 12px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: white;
-            font-size: 1rem;
-        }
-
-        /* --- 7. BUTTONS --- */
+        /* --- BUTTONS --- */
         .btn {
-            width: 100%; padding: 16px; border: none; border-radius: 12px;
-            font-size: 1rem; font-weight: 700; cursor: pointer;
-            transition: transform 0.1s; display: flex;
-            align-items: center; justify-content: center; gap: 8px;
-            margin-top: 10px;
+            width: 100%; padding: 14px; border-radius: 12px;
+            border: none; font-weight: 600; font-size: 1rem;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+            transition: transform 0.1s;
         }
-        .btn:active { transform: scale(0.97); }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), #2563eb);
-            color: white;
-            box-shadow: 0 4px 15px var(--primary-glow);
-        }
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3); }
+        .btn-success { background: linear-gradient(135deg, #10b981, #059669); color: white; display: none; margin-top: 15px; text-decoration: none; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-gray); margin-top: 10px; }
 
-        .btn-danger {
-            background: rgba(239, 68, 68, 0.2);
-            color: #fca5a5;
-            border: 1px solid rgba(239, 68, 68, 0.5);
+        /* --- PREVIEW AREA --- */
+        .preview-container {
+            margin-top: 20px; background: rgba(0,0,0,0.3);
+            border-radius: 10px; padding: 10px; text-align: center;
+            display: none;
         }
-        
-        .btn-download {
-            background: linear-gradient(135deg, var(--success), #16a34a);
-            color: white; margin-top: 15px;
-            text-decoration: none;
-            display: none; /* Hidden by default */
-            text-align: center;
-        }
+        .preview-img { max-width: 100%; border-radius: 6px; }
+        .size-badge { background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; margin-top: 5px; display: inline-block; }
 
-        /* --- 8. PREVIEW BOXES --- */
-        .preview-box {
-            margin-top: 20px; padding: 15px;
-            background: rgba(0,0,0,0.3); border-radius: 12px;
-            text-align: center; display: none;
-        }
-        .preview-img { max-width: 100%; border-radius: 8px; }
-        
-        /* List for selected files */
-        .file-list {
-            text-align: left;
-            margin-top: 15px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            max-height: 150px;
-            overflow-y: auto;
-        }
-        .file-item { padding: 5px 0; border-bottom: 1px solid var(--border); }
-
-        /* --- 9. TOAST & LOADER --- */
-        .toast {
-            position: fixed; bottom: 20px; left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: rgba(15, 23, 42, 0.95);
-            color: white; padding: 12px 24px; border-radius: 50px;
-            border: 1px solid var(--border);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            transition: transform 0.3s;
-            z-index: 1000; font-size: 0.9rem; white-space: nowrap;
-        }
-        .toast.show { transform: translateX(-50%) translateY(0); }
-
-        .loader-overlay {
+        /* --- LOADER --- */
+        .loader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); z-index: 2000;
-            display: none; flex-direction: column;
-            justify-content: center; align-items: center;
-            backdrop-filter: blur(5px);
+            background: rgba(0,0,0,0.85); z-index: 200;
+            display: none; align-items: center; justify-content: center; flex-direction: column;
         }
-        .spinner {
-            width: 40px; height: 40px;
-            border: 4px solid var(--border);
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .spinner { width: 40px; height: 40px; border: 4px solid #333; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
-        footer { text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 40px; }
-        footer a { color: var(--primary); text-decoration: none; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="brand-logo">Sheebu Tech</div>
-        <div class="tagline">Tools for Students | Made on Mobile</div>
+    <header class="app-header">
+        <div class="logo">SheebuTech <span style="font-weight:300; color:white;">Pro</span></div>
+        <div class="status-badge">v3.0 Offline</div>
     </header>
 
-    <div class="tabs-wrapper">
-        <div class="tabs-container">
-            <button class="tab-btn active" onclick="switchTab('photo', this)">Photo Resize</button>
-            <button class="tab-btn" onclick="switchTab('img2pdf', this)">Img to PDF</button>
-            <button class="tab-btn" onclick="switchTab('merge', this)">Merge PDF</button>
-            <button class="tab-btn" onclick="switchTab('sign', this)">Signature</button>
-        </div>
-    </div>
-
     <main class="container">
-        
-        <section id="photo-panel" class="tool-section active">
-            <div class="card">
-                <div class="upload-zone" onclick="document.getElementById('p-input').click()">
-                    <span class="upload-icon">📷</span>
-                    <div class="upload-text">Upload Photo</div>
-                    <div style="font-size:0.8rem; color:var(--text-muted);">Supports JPG, PNG</div>
-                    <input type="file" id="p-input" hidden accept="image/*">
-                </div>
 
-                <div id="p-controls" style="display:none; margin-top: 20px;">
-                    <div class="control-group">
-                        <label class="control-label">Exam Preset</label>
-                        <select id="p-preset" onchange="applyPreset()">
-                            <option value="">Custom Size</option>
-                            <option value="ssc">SSC / Railway (3.5 x 4.5 cm)</option>
-                            <option value="upsc">UPSC Civil Services</option>
-                            <option value="gate">GATE / JEE</option>
+        <section id="panel-compress" class="tool-panel active">
+            <div class="card">
+                <div class="section-title"><i class="fas fa-compress-arrows-alt"></i> Magic Compressor (KB)</div>
+                <div class="upload-box" onclick="document.getElementById('c-input').click()">
+                    <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: var(--text-gray);"></i>
+                    <p style="margin: 5px 0 0;">Tap to Upload Photo</p>
+                    <input type="file" id="c-input" hidden accept="image/*">
+                </div>
+                
+                <div id="c-controls" style="display:none; margin-top:20px;">
+                    <div class="input-group">
+                        <label class="label">Target Size (KB)</label>
+                        <input type="number" id="c-target" placeholder="e.g. 50 (for SSC/Govt Jobs)" value="50">
+                    </div>
+                    
+                    <details style="margin-bottom:15px; color:var(--text-gray); font-size:0.9rem;">
+                        <summary>Advanced Options</summary>
+                        <div class="input-group" style="margin-top:10px;">
+                            <label class="label">Resize Width (px) - Optional</label>
+                            <input type="number" id="c-width" placeholder="Keep empty for original">
+                        </div>
+                    </details>
+
+                    <button class="btn btn-primary" onclick="compressImage()">⚡ Compress to Target KB</button>
+
+                    <div id="c-result" class="preview-container">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                            <span class="size-badge" id="c-original-size">Orig: 0KB</span>
+                            <span class="size-badge" style="color:#4ade80;" id="c-final-size">New: 0KB</span>
+                        </div>
+                        <img id="c-img-out" class="preview-img">
+                        <a id="c-dl-btn" class="btn btn-success" download>Download Compressed Image</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="panel-passport" class="tool-panel">
+            <div class="card">
+                <div class="section-title"><i class="fas fa-id-card"></i> Passport Grid (Print)</div>
+                <div class="upload-box" onclick="document.getElementById('pp-input').click()">
+                    <i class="fas fa-user-circle" style="font-size: 2rem; color: var(--text-gray);"></i>
+                    <p style="margin: 5px 0 0;">Upload Portrait Photo</p>
+                    <input type="file" id="pp-input" hidden accept="image/*">
+                </div>
+                
+                <div id="pp-controls" style="display:none; margin-top:20px;">
+                    <div class="input-group">
+                        <label class="label">Paper Size</label>
+                        <select id="pp-paper">
+                            <option value="4x6">4x6 Inch (8 Photos) - Standard</option>
+                            <option value="a4">A4 Size (30+ Photos)</option>
                         </select>
                     </div>
+                    <button class="btn btn-primary" onclick="createPassportGrid()">🖨️ Create Printable Sheet</button>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                        <div class="control-group">
-                            <label class="control-label">Width (px)</label>
-                            <input type="number" id="p-w">
-                        </div>
-                        <div class="control-group">
-                            <label class="control-label">Height (px)</label>
-                            <input type="number" id="p-h">
-                        </div>
-                    </div>
-
-                    <button class="btn btn-primary" onclick="processPhoto()">⚡ Resize & Download</button>
-
-                    <div id="p-result" class="preview-box">
-                        <img id="p-img-out" class="preview-img">
-                        <div id="p-size-tag" style="margin:10px 0; color:var(--success);"></div>
-                        <a id="p-dl-btn" class="btn btn-download" download>Download Image</a>
+                    <div id="pp-result" class="preview-container">
+                        <img id="pp-img-out" class="preview-img">
+                        <a id="pp-dl-btn" class="btn btn-success" download>Download Printable Sheet</a>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="img2pdf-panel" class="tool-section">
+        <section id="panel-tools" class="tool-panel">
             <div class="card">
-                <div class="upload-zone" onclick="document.getElementById('i2p-input').click()">
-                    <span class="upload-icon">🖼️ ➡️ 📄</span>
-                    <div class="upload-text">Select Images</div>
-                    <div style="font-size:0.8rem; color:var(--text-muted);">Select Multiple (JPG/PNG)</div>
-                    <input type="file" id="i2p-input" hidden accept="image/*" multiple>
-                    <div id="i2p-count" class="file-count">0 files selected</div>
-                </div>
-
-                <div id="i2p-controls" style="display:none; margin-top:20px;">
-                    <div class="file-list" id="i2p-list"></div>
-                    
-                    <div class="control-group">
-                         <label class="control-label">PDF Orientation</label>
-                         <select id="i2p-orient">
-                             <option value="p">Portrait (Vertical)</option>
-                             <option value="l">Landscape (Horizontal)</option>
-                         </select>
-                    </div>
-
-                    <button class="btn btn-primary" onclick="convertImgToPdf()">⚙️ Convert to PDF</button>
-                    <a id="i2p-dl-btn" class="btn btn-download">Download PDF</a>
-                    <button class="btn btn-danger" onclick="resetTool('i2p')">Clear All</button>
-                </div>
-            </div>
-        </section>
-
-        <section id="merge-panel" class="tool-section">
-            <div class="card">
-                <div class="upload-zone" onclick="document.getElementById('m-input').click()">
-                    <span class="upload-icon">📄 ➕ 📄</span>
-                    <div class="upload-text">Select PDFs</div>
-                    <div style="font-size:0.8rem; color:var(--text-muted);">Select Multiple PDF files</div>
-                    <input type="file" id="m-input" hidden accept="application/pdf" multiple>
-                    <div id="m-count" class="file-count">0 files selected</div>
-                </div>
-
-                <div id="m-controls" style="display:none; margin-top:20px;">
-                    <div class="file-list" id="m-list"></div>
-                    
-                    <button class="btn btn-primary" onclick="mergePdfs()">🔗 Merge PDFs</button>
-                    <a id="m-dl-btn" class="btn btn-download">Download Merged PDF</a>
-                    <button class="btn btn-danger" onclick="resetTool('m')">Clear All</button>
-                </div>
-            </div>
-        </section>
-
-        <section id="sign-panel" class="tool-section">
-            <div class="card">
-                <div class="upload-zone" onclick="document.getElementById('s-input').click()">
-                    <span class="upload-icon">✒️</span>
-                    <div class="upload-text">Upload Signature</div>
+                <div class="section-title"><i class="fas fa-signature"></i> Signature Cleaner</div>
+                <div class="upload-box" onclick="document.getElementById('s-input').click()">
+                    <i class="fas fa-pen-nib" style="font-size: 2rem;"></i>
+                    <p>Upload Signature (Phone Photo)</p>
                     <input type="file" id="s-input" hidden accept="image/*">
                 </div>
-
-                <div id="s-controls" style="display:none; margin-top:20px;">
-                    <div class="control-group">
-                        <label class="control-label">Clean Level</label>
-                        <input type="range" id="s-threshold" min="100" max="200" value="150" style="width:100%">
-                    </div>
-                    <button class="btn btn-primary" onclick="processSignature()">✨ Clean Background</button>
-                    <div id="s-result" class="preview-box">
-                        <img id="s-img-out" class="preview-img" style="background:white; padding:5px;">
-                        <a id="s-dl-btn" class="btn btn-download" download>Download Signature</a>
+                <div id="s-controls" style="display:none; margin-top:15px;">
+                    <input type="range" id="s-thresh" min="100" max="200" value="150" style="width:100%">
+                    <p style="text-align:center; font-size:0.8rem; color:var(--text-gray);">Adjust Blackness</p>
+                    <button class="btn btn-primary" onclick="cleanSignature()" style="margin-top:10px;">Clean Background</button>
+                    <div id="s-result" class="preview-container" style="background:white;">
+                        <img id="s-img-out" class="preview-img">
+                        <a id="s-dl-btn" class="btn btn-success" download>Download PNG</a>
                     </div>
                 </div>
+            </div>
+
+            <div class="card">
+                <div class="section-title"><i class="fas fa-file-pdf"></i> Merge PDFs</div>
+                <div class="upload-box" onclick="document.getElementById('m-input').click()">
+                    <i class="fas fa-layer-group" style="font-size: 2rem;"></i>
+                    <p>Select Multiple PDFs</p>
+                    <input type="file" id="m-input" hidden accept="application/pdf" multiple>
+                    <div id="m-count" class="file-info"></div>
+                </div>
+                <button id="m-btn" class="btn btn-primary" onclick="mergePDFs()" style="display:none; margin-top:15px;">Merge Now</button>
+                <a id="m-dl-btn" class="btn btn-success" style="display:none;">Download Merged PDF</a>
+            </div>
+        </section>
+
+        <section id="panel-i2p" class="tool-panel">
+            <div class="card">
+                <div class="section-title"><i class="fas fa-images"></i> Image to PDF</div>
+                <div class="upload-box" onclick="document.getElementById('i2p-input').click()">
+                    <i class="fas fa-copy" style="font-size: 2rem;"></i>
+                    <p>Select Images (Order Matters)</p>
+                    <input type="file" id="i2p-input" hidden accept="image/*" multiple>
+                    <div id="i2p-count" class="file-info"></div>
+                </div>
+                <button id="i2p-btn" class="btn btn-primary" onclick="imagesToPdf()" style="display:none; margin-top:15px;">Convert to PDF</button>
+                <a id="i2p-dl-btn" class="btn btn-success" style="display:none;">Download PDF</a>
             </div>
         </section>
 
     </main>
 
-    <footer>
-        <p>Developed by <strong>Sheebu Tech</strong></p>
-        <p>100% Client-Side Secure</p>
-    </footer>
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="switchTab('compress', this)">
+            <i class="fas fa-compress-alt"></i>
+            <span>Resize</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('passport', this)">
+            <i class="fas fa-id-card"></i>
+            <span>Passport</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('i2p', this)">
+            <i class="fas fa-file-pdf"></i>
+            <span>Img2PDF</span>
+        </button>
+        <button class="nav-item" onclick="switchTab('tools', this)">
+            <i class="fas fa-th-large"></i>
+            <span>Tools</span>
+        </button>
+    </nav>
 
-    <div id="toast" class="toast">Action Successful</div>
-    <div id="loader" class="loader-overlay">
+    <div id="loader" class="loader">
         <div class="spinner"></div>
-        <p style="margin-top:15px; font-weight:bold;">Processing...</p>
+        <p style="color:white; margin-top:15px; font-weight:600;">Processing...</p>
     </div>
 
     <script>
-        // --- UTILS ---
-        function showLoader(show) { document.getElementById('loader').style.display = show ? 'flex' : 'none'; }
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.innerText = "✅ " + msg;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 3000);
-        }
+        // --- UTILITIES ---
+        const $ = id => document.getElementById(id);
+        const loader = (show) => $('loader').style.display = show ? 'flex' : 'none';
+        const formatBytes = (bytes) => (bytes / 1024).toFixed(1) + ' KB';
 
-        function switchTab(tabId, btn) {
-            document.querySelectorAll('.tool-section').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabId + '-panel').classList.add('active');
+        function switchTab(panelId, btn) {
+            document.querySelectorAll('.tool-panel').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            $('panel-' + panelId).classList.add('active');
             btn.classList.add('active');
         }
 
-        function resetTool(prefix) {
-            document.getElementById(prefix + '-input').value = "";
-            document.getElementById(prefix + '-controls').style.display = 'none';
-            document.getElementById(prefix + '-dl-btn').style.display = 'none';
-            if(document.getElementById(prefix + '-count')) document.getElementById(prefix + '-count').style.display = 'none';
-        }
+        // --- 1. MAGIC COMPRESSOR (The Brain) ---
+        let cFile = null;
+        $('c-input').addEventListener('change', e => {
+            if(e.target.files[0]) {
+                cFile = e.target.files[0];
+                $('c-controls').style.display = 'block';
+                $('c-original-size').innerText = 'Orig: ' + formatBytes(cFile.size);
+            }
+        });
 
-        // --- 1. PHOTO RESIZER LOGIC ---
-        let pImg = new Image();
-        document.getElementById('p-input').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if(!file) return;
-            const reader = new FileReader();
-            reader.onload = function(ev) {
-                pImg.src = ev.target.result;
-                pImg.onload = function() {
-                    document.getElementById('p-controls').style.display = 'block';
-                    document.getElementById('p-w').value = pImg.width;
-                    document.getElementById('p-h').value = pImg.height;
+        async function compressImage() {
+            if(!cFile) return;
+            loader(true);
+            
+            const targetKB = parseInt($('c-target').value) || 50;
+            const targetBytes = targetKB * 1024;
+            const customWidth = $('c-width').value ? parseInt($('c-width').value) : 0;
+
+            const img = await loadImage(URL.createObjectURL(cFile));
+            const canvas = document.createElement('canvas');
+            let ctx = canvas.getContext('2d');
+
+            // Initial dimensions
+            let w = customWidth || img.width;
+            let h = customWidth ? (img.height * (customWidth/img.width)) : img.height;
+            
+            canvas.width = w;
+            canvas.height = h;
+            ctx.drawImage(img, 0, 0, w, h);
+
+            // Binary search-like compression
+            let minQ = 0.1, maxQ = 1.0, quality = 0.9;
+            let dataUrl = '';
+            
+            // Fast loop to find quality
+            for(let i=0; i<6; i++) {
+                quality = (minQ + maxQ) / 2;
+                dataUrl = canvas.toDataURL('image/jpeg', quality);
+                // Approx size calculation
+                let head = 'data:image/jpeg;base64,';
+                let size = Math.round((dataUrl.length - head.length) * 3/4);
+                
+                if(size > targetBytes) {
+                    maxQ = quality;
+                } else {
+                    minQ = quality;
                 }
             }
-            reader.readAsDataURL(file);
-        });
 
-        const presets = { ssc: {w: 132, h: 170}, upsc: {w: 350, h: 350}, gate: {w: 480, h: 640} };
-        function applyPreset() {
-            const val = document.getElementById('p-preset').value;
-            if(presets[val]) {
-                document.getElementById('p-w').value = presets[val].w;
-                document.getElementById('p-h').value = presets[val].h;
-            }
+            // Final Output
+            $('c-img-out').src = dataUrl;
+            $('c-result').style.display = 'block';
+            
+            // Calculate final size properly
+            const blob = await (await fetch(dataUrl)).blob();
+            $('c-final-size').innerText = 'New: ' + formatBytes(blob.size);
+            
+            const btn = $('c-dl-btn');
+            btn.href = dataUrl;
+            btn.download = `Compressed_${targetKB}KB.jpg`;
+            btn.style.display = 'flex';
+            
+            loader(false);
         }
 
-        function processPhoto() {
+        // --- 2. PASSPORT GRID ---
+        let ppFile = null;
+        $('pp-input').addEventListener('change', e => {
+            if(e.target.files[0]) {
+                ppFile = e.target.files[0];
+                $('pp-controls').style.display = 'block';
+            }
+        });
+
+        async function createPassportGrid() {
+            if(!ppFile) return;
+            loader(true);
+
+            const img = await loadImage(URL.createObjectURL(ppFile));
             const canvas = document.createElement('canvas');
-            canvas.width = document.getElementById('p-w').value;
-            canvas.height = document.getElementById('p-h').value;
             const ctx = canvas.getContext('2d');
-            ctx.drawImage(pImg, 0, 0, canvas.width, canvas.height);
+
+            // 4x6 inch @ 300 DPI = 1200 x 1800 px
+            const pW = 1200, pH = 1800; 
+            canvas.width = pW;
+            canvas.height = pH;
             
-            const url = canvas.toDataURL('image/jpeg', 0.85);
-            const outImg = document.getElementById('p-img-out');
-            outImg.src = url;
-            document.getElementById('p-result').style.display = 'block';
-            
-            const btn = document.getElementById('p-dl-btn');
-            btn.href = url;
-            btn.download = "SheebuTech_Photo.jpg";
-            btn.style.display = "flex";
-            
-            showToast("Photo Resized!");
-        }
+            // White background
+            ctx.fillStyle = "white";
+            ctx.fillRect(0,0, pW, pH);
 
-        // --- 2. IMAGE TO PDF LOGIC (using jsPDF) ---
-        let i2pFiles = [];
-        document.getElementById('i2p-input').addEventListener('change', function(e) {
-            i2pFiles = Array.from(e.target.files);
-            if(i2pFiles.length > 0) {
-                document.getElementById('i2p-controls').style.display = 'block';
-                document.getElementById('i2p-count').innerText = i2pFiles.length + " files selected";
-                document.getElementById('i2p-count').style.display = 'block';
-                
-                const list = document.getElementById('i2p-list');
-                list.innerHTML = "";
-                i2pFiles.forEach(f => {
-                    list.innerHTML += `<div class="file-item">📷 ${f.name}</div>`;
-                });
-            }
-        });
+            // Photo Size approx 300x380 px with margin
+            const photoW = 270, photoH = 350;
+            const gapX = 30, gapY = 50;
+            const startX = 50, startY = 50;
 
-        async function convertImgToPdf() {
-            showLoader(true);
-            const { jsPDF } = window.jspdf;
-            const orientation = document.getElementById('i2p-orient').value;
-            const doc = new jsPDF({ orientation: orientation });
-
-            for (let i = 0; i < i2pFiles.length; i++) {
-                const dataUrl = await fileToDataURL(i2pFiles[i]);
-                const imgProps = doc.getImageProperties(dataUrl);
-                const pdfWidth = doc.internal.pageSize.getWidth();
-                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-                
-                if (i > 0) doc.addPage();
-                doc.addImage(dataUrl, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-            }
-
-            const pdfBlob = doc.output('blob');
-            const url = URL.createObjectURL(pdfBlob);
-            const btn = document.getElementById('i2p-dl-btn');
-            btn.href = url;
-            btn.download = "SheebuTech_Images.pdf";
-            btn.style.display = "flex";
-            
-            showLoader(false);
-            showToast("PDF Created!");
-        }
-
-        function fileToDataURL(file) {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onload = (e) => resolve(e.target.result);
-                reader.readAsDataURL(file);
-            });
-        }
-
-        // --- 3. PDF MERGE LOGIC (using PDF-Lib) ---
-        let mergeFiles = [];
-        document.getElementById('m-input').addEventListener('change', function(e) {
-            mergeFiles = Array.from(e.target.files);
-            if(mergeFiles.length > 0) {
-                document.getElementById('m-controls').style.display = 'block';
-                document.getElementById('m-count').innerText = mergeFiles.length + " PDFs selected";
-                document.getElementById('m-count').style.display = 'block';
-                
-                const list = document.getElementById('m-list');
-                list.innerHTML = "";
-                mergeFiles.forEach(f => {
-                    list.innerHTML += `<div class="file-item">📄 ${f.name}</div>`;
-                });
-            }
-        });
-
-        async function mergePdfs() {
-            if(mergeFiles.length < 2) {
-                alert("Please select at least 2 PDF files");
-                return;
-            }
-            showLoader(true);
-            try {
-                const { PDFDocument } = PDFLib;
-                const mergedPdf = await PDFDocument.create();
-
-                for (const file of mergeFiles) {
-                    const arrayBuffer = await file.arrayBuffer();
-                    const pdf = await PDFDocument.load(arrayBuffer);
-                    const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
-                    copiedPages.forEach((page) => mergedPdf.addPage(page));
+            // Draw 8 photos (2 cols, 4 rows)
+            for(let row=0; row<4; row++) {
+                for(let col=0; col<2; col++) {
+                    let x = startX + col * (photoW + gapX); // 2 columns widely spaced
+                    if(col===1) x += 150; // Extra gap in middle for cutting
+                    let y = startY + row * (photoH + gapY);
+                    
+                    ctx.drawImage(img, x, y, photoW, photoH);
+                    // Border
+                    ctx.strokeStyle = "#ccc";
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(x, y, photoW, photoH);
                 }
-
-                const pdfBytes = await mergedPdf.save();
-                const blob = new Blob([pdfBytes], { type: 'application/pdf' });
-                const url = URL.createObjectURL(blob);
-                
-                const btn = document.getElementById('m-dl-btn');
-                btn.href = url;
-                btn.download = "SheebuTech_Merged.pdf";
-                btn.style.display = "flex";
-                showToast("PDFs Merged!");
-            } catch (err) {
-                alert("Error merging: " + err.message);
             }
-            showLoader(false);
+
+            const url = canvas.toDataURL('image/jpeg', 0.9);
+            $('pp-img-out').src = url;
+            $('pp-result').style.display = 'block';
+            const btn = $('pp-dl-btn');
+            btn.href = url;
+            btn.download = "Passport_Sheet.jpg";
+            btn.style.display = 'flex';
+            loader(false);
         }
 
-        // --- 4. SIGNATURE CLEANER LOGIC ---
-        let sImg = new Image();
-        document.getElementById('s-input').addEventListener('change', function(e) {
-            const f = e.target.files[0];
-            if(!f) return;
-            const r = new FileReader();
-            r.onload = function(ev) {
-                sImg.src = ev.target.result;
-                sImg.onload = () => document.getElementById('s-controls').style.display = 'block';
+        // --- 3. SIGNATURE ---
+        let sFile = null;
+        $('s-input').addEventListener('change', e => {
+            if(e.target.files[0]) {
+                sFile = e.target.files[0];
+                $('s-controls').style.display = 'block';
             }
-            r.readAsDataURL(f);
         });
 
-        function processSignature() {
+        async function cleanSignature() {
+            loader(true);
+            const img = await loadImage(URL.createObjectURL(sFile));
             const canvas = document.createElement('canvas');
-            canvas.width = sImg.width; 
-            canvas.height = sImg.height;
+            canvas.width = img.width; canvas.height = img.height;
             const ctx = canvas.getContext('2d');
-            ctx.drawImage(sImg, 0, 0);
+            ctx.drawImage(img, 0, 0);
             
-            const imageData = ctx.getImageData(0,0, canvas.width, canvas.height);
+            const imageData = ctx.getImageData(0,0,canvas.width, canvas.height);
             const data = imageData.data;
-            const thresh = parseInt(document.getElementById('s-threshold').value);
+            const thresh = parseInt($('s-thresh').value);
 
             for(let i=0; i<data.length; i+=4) {
                 const avg = (data[i] + data[i+1] + data[i+2]) / 3;
-                if(avg > thresh) {
-                    // Make white transparent
-                    data[i+3] = 0; 
-                } else {
-                    // Make ink black
-                    data[i] = 0; data[i+1] = 0; data[i+2] = 0;
-                }
+                if(avg > thresh) data[i+3] = 0; // Transparent
+                else { data[i]=0; data[i+1]=0; data[i+2]=0; } // Black
             }
             ctx.putImageData(imageData, 0, 0);
             
             const url = canvas.toDataURL('image/png');
-            const imgOut = document.getElementById('s-img-out');
-            imgOut.src = url;
-            document.getElementById('s-result').style.display = 'block';
-            
-            const btn = document.getElementById('s-dl-btn');
+            $('s-img-out').src = url;
+            $('s-result').style.display = 'block';
+            const btn = $('s-dl-btn');
             btn.href = url;
+            btn.download = "Sign_Clean.png";
             btn.style.display = 'flex';
-            showToast("Signature Cleaned!");
+            loader(false);
+        }
+
+        // --- 4. IMG 2 PDF ---
+        let i2pList = [];
+        $('i2p-input').addEventListener('change', e => {
+            i2pList = Array.from(e.target.files);
+            $('i2p-count').innerText = i2pList.length + " Photos Selected";
+            $('i2p-btn').style.display = 'flex';
+        });
+
+        async function imagesToPdf() {
+            loader(true);
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            for(let i=0; i<i2pList.length; i++) {
+                if(i>0) doc.addPage();
+                const img = await loadImage(URL.createObjectURL(i2pList[i]));
+                
+                // Scale to fit A4
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                const ratio = Math.min(pageWidth / img.width, pageHeight / img.height);
+                const w = img.width * ratio;
+                const h = img.height * ratio;
+                
+                doc.addImage(img, 'JPEG', 0, 0, w, h);
+            }
+            
+            const blob = doc.output('blob');
+            const url = URL.createObjectURL(blob);
+            const btn = $('i2p-dl-btn');
+            btn.href = url;
+            btn.download = "Images.pdf";
+            btn.style.display = 'flex';
+            loader(false);
+        }
+
+        // --- 5. PDF MERGE ---
+        let mList = [];
+        $('m-input').addEventListener('change', e => {
+            mList = Array.from(e.target.files);
+            $('m-count').innerText = mList.length + " PDFs Selected";
+            $('m-btn').style.display = 'flex';
+        });
+
+        async function mergePDFs() {
+            loader(true);
+            const { PDFDocument } = PDFLib;
+            const mergedPdf = await PDFDocument.create();
+
+            for (const file of mList) {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await PDFDocument.load(arrayBuffer);
+                const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+                copiedPages.forEach((page) => mergedPdf.addPage(page));
+            }
+
+            const pdfBytes = await mergedPdf.save();
+            const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+            const url = URL.createObjectURL(blob);
+            
+            const btn = $('m-dl-btn');
+            btn.href = url;
+            btn.download = "Merged.pdf";
+            btn.style.display = 'flex';
+            loader(false);
+        }
+
+        // Helper
+        function loadImage(src) {
+            return new Promise(resolve => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.src = src;
+            });
         }
     </script>
 </body>
-    </html>
+                        </html>
     
