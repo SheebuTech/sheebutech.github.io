@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ShibuHelper 4.0 - Govt Job Tool</title>
+    <meta name="theme-color" content="#1e293b">
+    
+    <!-- Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary: #06b6d4;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f8fafc;
+            --text-mute: #94a3b8;
+            --border: rgba(255,255,255,0.1);
+            --success: #10b981;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        body { background: var(--bg); color: var(--text); padding-bottom: 80px; overflow-x: hidden; }
+
+        /* Header */
+        .header {
+            background: rgba(30, 41, 59, 0.95);
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .brand { font-size: 1.2rem; font-weight: 700; background: linear-gradient(to right, #818cf8, #22d3ee); -webkit-background-clip: text; color: transparent; }
+
+        /* Container */
+        .container { max-width: 600px; margin: 0 auto; padding: 15px; }
+
+        /* Tabs */
+        .panel { display: none; animation: fadeIn 0.3s ease; }
+        .panel.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Cards */
+        .card { background: var(--card); border-radius: 16px; padding: 20px; margin-bottom: 20px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; font-weight: 600; font-size: 1.1rem; color: var(--secondary); }
+
+        /* Exam Presets */
+        .chips-container { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; }
+        .chip { 
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border); 
+            padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; white-space: nowrap; cursor: pointer; transition: 0.2s;
+        }
+        .chip.active { background: var(--primary); border-color: var(--primary); color: white; }
+
+        /* Inputs */
+        .form-group { margin-bottom: 15px; }
+        .form-label { display: block; font-size: 0.85rem; color: var(--text-mute); margin-bottom: 6px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        input[type="number"], select, input[type="text"] {
+            width: 100%; background: #020617; border: 1px solid var(--border);
+            padding: 12px; border-radius: 8px; color: white; font-size: 1rem;
+        }
+        input:focus { outline: none; border-color: var(--primary); }
+
+        /* Upload Box */
+        .upload-area {
+            border: 2px dashed var(--border); border-radius: 12px; padding: 30px;
+            text-align: center; cursor: pointer; background: rgba(255,255,255,0.02); transition: 0.2s;
+        }
+        .upload-area:active { background: rgba(79, 70, 229, 0.1); border-color: var(--primary); }
+        .upload-icon { font-size: 2rem; color: var(--text-mute); margin-bottom: 10px; }
+
+        /* Buttons */
+        .btn {
+            width: 100%; padding: 14px; border: none; border-radius: 10px;
+            font-weight: 600; font-size: 1rem; cursor: pointer; display: flex;
+            align-items: center; justify-content: center; gap: 8px; margin-top: 10px;
+        }
+        .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-mute); }
+
+        /* Cropper Modal */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: black; z-index: 200; display: none; flex-direction: column;
+        }
+        .cropper-wrapper { flex: 1; overflow: hidden; position: relative; }
+        .cropper-controls { padding: 15px; background: var(--card); display: flex; gap: 10px; }
+
+        /* Toggle Switch */
+        .toggle-row { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; margin-bottom: 15px; }
+        .toggle-switch {
+            position: relative; display: inline-block; width: 44px; height: 24px;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #475569; transition: .4s; border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px;
+            background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(20px); }
+
+        /* Result Preview */
+        .preview-box { margin-top: 20px; text-align: center; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; display: none; }
+        .preview-img { max-width: 100%; height: auto; border-radius: 5px; border: 1px solid var(--border); }
+        .stats { font-size: 0.8rem; color: var(--success); margin: 10px 0; background: rgba(16, 185, 129, 0.1); padding: 5px; border-radius: 15px; display: inline-block; }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: rgba(15, 23, 42, 0.98); border-top: 1px solid var(--border);
+            display: flex; justify-content: space-around; padding: 10px; z-index: 90;
+        }
+        .nav-item { background: none; border: none; color: var(--text-mute); font-size: 0.7rem; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .nav-item i { font-size: 1.3rem; }
+        .nav-item.active { color: var(--secondary); }
+
+        /* Loader */
+        .loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 300; display: none; justify-content: center; align-items: center; color: white; flex-direction: column; }
+        .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.3); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s infinite linear; margin-bottom: 10px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #333; color: white; padding: 10px 20px; border-radius: 20px; font-size: 0.9rem; z-index: 400; display: none; }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="brand"><i class="fas fa-graduation-cap"></i> ShibuHelper</div>
+        <div style="font-size:0.8rem; color:var(--success);">Student Pro</div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        
+        <!-- COMPRESSOR PANEL -->
+        <section id="panel-compress" class="panel active">
+            
+            <!-- Presets -->
+            <div class="chips-container">
+                <div class="chip active" onclick="setPreset('custom')">Custom</div>
+                <div class="chip" onclick="setPreset('ssc')">SSC (20-50KB)</div>
+                <div class="chip" onclick="setPreset('upsc')">UPSC Photo</div>
+                <div class="chip" onclick="setPreset('ibps')">IBPS/Bank</div>
+                <div class="chip" onclick="setPreset('neet')">NEET UG</div>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><i class="fas fa-compress-arrows-alt"></i> Form Compressor</div>
+                
+                <div class="upload-area" id="drop-zone" onclick="document.getElementById('file-input').click()">
+                    <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                    <p>फोटो यहाँ अपलोड करें</p>
+                    <small style="color:var(--text-mute)">Crop, Resize & Date Stamp automatically</small>
+                    <input type="file" id="file-input" hidden accept="image/*">
+                </div>
+
+                <div id="controls" style="margin-top:20px; display:none;">
+                    
+                    <!-- Date Stamp Toggle -->
+                    <div class="toggle-row">
+                        <div>
+                            <span style="display:block; font-weight:500;">Date on Photo (DOP)</span>
+                            <small style="color:var(--text-mute);">For SSC/Railways forms</small>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="add-date">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div id="date-input-div" class="form-group" style="display:none;">
+                        <label class="form-label">Date to print:</label>
+                        <input type="date" id="photo-date" style="color-scheme: dark;">
+                    </div>
+
+                    <!-- Size & Dim inputs -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Max Size (KB)</label>
+                            <input type="number" id="target-kb" value="50">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Format</label>
+                            <select id="format">
+                                <option value="image/jpeg">JPEG (Govt)</option>
+                                <option value="image/png">PNG</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <details style="margin-bottom:15px; font-size:0.9rem; color:var(--secondary);">
+                        <summary>Advanced Dimensions (cm/px)</summary>
+                        <div class="form-row" style="margin-top:10px;">
+                            <div>
+                                <label class="form-label">Width</label>
+                                <input type="number" id="width-val" placeholder="Auto">
+                            </div>
+                            <div>
+                                <label class="form-label">Unit</label>
+                                <select id="dim-unit">
+                                    <option value="px">Pixels</option>
+                                    <option value="cm">CM</option>
+                                    <option value="mm">MM</option>
+                                </select>
+                            </div>
+                        </div>
+                    </details>
+
+                    <button class="btn btn-primary" onclick="processImage()">
+                        <i class="fas fa-bolt"></i> Process Image
+                    </button>
+                </div>
+
+                <!-- Result -->
+                <div id="result-area" class="preview-box">
+                    <div class="stats" id="size-stat">Size: Calculating...</div>
+                    <img id="final-img" class="preview-img">
+                    <a id="download-link" class="btn btn-success" download="Form_Photo.jpg">
+                        <i class="fas fa-download"></i> Save to Gallery
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- PASSPORT MAKER PANEL -->
+        <section id="panel-passport" class="panel">
+            <div class="card">
+                <div class="card-header"><i class="fas fa-id-card"></i> Passport Maker</div>
+                <div class="upload-area" onclick="document.getElementById('pp-input').click()">
+                    <i class="fas fa-camera upload-icon"></i>
+                    <p>Select Selfie/Photo</p>
+                    <input type="file" id="pp-input" hidden accept="image/*">
+                </div>
+                
+                <div id="pp-controls" style="display:none; margin-top:15px;">
+                    <div class="form-group">
+                        <label class="form-label">Paper Size</label>
+                        <select id="pp-paper">
+                            <option value="4x6">4x6 inch (8 Photos) - Lab Print</option>
+                            <option value="a4">A4 Size (30+ Photos) - Home Print</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="generatePassportSheet()">
+                        <i class="fas fa-print"></i> Create Printable Sheet
+                    </button>
+                </div>
+
+                <div id="pp-result" class="preview-box">
+                    <img id="pp-img-out" class="preview-img">
+                    <a id="pp-dl" class="btn btn-success" download>Download Sheet</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- PDF TOOLS PANEL -->
+        <section id="panel-pdf" class="panel">
+            <div class="card">
+                <div class="card-header"><i class="fas fa-file-pdf"></i> Image to PDF</div>
+                <div class="upload-area" onclick="document.getElementById('pdf-input').click()">
+                    <i class="fas fa-images upload-icon"></i>
+                    <p>Select Multiple Images</p>
+                    <input type="file" id="pdf-input" multiple hidden accept="image/*">
+                </div>
+                <div id="pdf-info" style="margin:10px 0; color:var(--success); display:none;"></div>
+                <button class="btn btn-primary" onclick="createPDF()">Convert to PDF</button>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><i class="fas fa-signature"></i> Signature Cleaner</div>
+                <div class="upload-area" onclick="document.getElementById('sign-input').click()">
+                    <i class="fas fa-pen-nib upload-icon"></i>
+                    <p>Upload Signature</p>
+                    <input type="file" id="sign-input" hidden accept="image/*">
+                </div>
+                <div id="sign-result" class="preview-box" style="background:white; padding:10px;">
+                    <img id="sign-out" class="preview-img">
+                    <a id="sign-dl" class="btn btn-success" download="sign.png">Download Transparent PNG</a>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" onclick="switchTab('compress', this)">
+            <i class="fas fa-sliders-h"></i> Size/Date
+        </button>
+        <button class="nav-item" onclick="switchTab('passport', this)">
+            <i class="fas fa-user-circle"></i> Passport
+        </button>
+        <button class="nav-item" onclick="switchTab('pdf', this)">
+            <i class="fas fa-file-alt"></i> PDF/Sign
+        </button>
+    </nav>
+
+    <!-- CROPPER MODAL -->
+    <div id="cropper-modal" class="modal">
+        <div class="cropper-wrapper">
+            <img id="cropper-img" style="max-width: 100%;">
+        </div>
+        <div class="cropper-controls">
+            <button class="btn btn-outline" onclick="cancelCrop()">Cancel</button>
+            <button class="btn btn-primary" onclick="finishCrop()">Done</button>
+        </div>
+    </div>
+
+    <!-- UTILS -->
+    <div id="loader" class="loader">
+        <div class="spinner"></div>
+        <p>Processing...</p>
+    </div>
+    <div id="toast" class="toast">Action Successful</div>
+
+    <script>
+        // --- GLOBAL VARIABLES ---
+        let cropper = null;
+        let currentFile = null;
+        let currentMode = 'compress'; // compress or passport
+
+        // --- NAVIGATION ---
+        function switchTab(id, el) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(`panel-${id}`).classList.add('active');
+            el.classList.add('active');
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 3000);
+        }
+
+        function loader(show) {
+            document.getElementById('loader').style.display = show ? 'flex' : 'none';
+        }
+
+        // --- PRESETS LOGIC ---
+        const presets = {
+            'custom': { kb: 50, w: '', h: '', unit: 'px', ratio: NaN },
+            'ssc': { kb: 50, w: 3.5, h: 4.5, unit: 'cm', ratio: 3.5/4.5 },
+            'upsc': { kb: 300, w: 350, h: 350, unit: 'px', ratio: 1 },
+            'ibps': { kb: 50, w: 4.5, h: 3.5, unit: 'cm', ratio: 4.5/3.5 }, // Signature mostly
+            'neet': { kb: 200, w: 4, h: 6, unit: 'cm', ratio: 2/3 } // Postcard
+        };
+
+        function setPreset(key) {
+            document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const p = presets[key];
+            document.getElementById('target-kb').value = p.kb;
+            document.getElementById('width-val').value = p.w;
+            document.getElementById('dim-unit').value = p.unit;
+            
+            // If image is loaded, update crop box aspect ratio
+            if(cropper && !isNaN(p.ratio)) {
+                cropper.setAspectRatio(p.ratio);
+                showToast(`AspectRatio set to ${key.toUpperCase()}`);
+            }
+        }
+
+        // --- CROPPER HANDLERS ---
+        document.getElementById('file-input').addEventListener('change', e => initCropper(e, 'compress'));
+        document.getElementById('pp-input').addEventListener('change', e => initCropper(e, 'passport'));
+
+        function initCropper(e, mode) {
+            if (!e.target.files[0]) return;
+            currentFile = e.target.files[0];
+            currentMode = mode;
+            
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const img = document.getElementById('cropper-img');
+                img.src = evt.target.result;
+                document.getElementById('cropper-modal').style.display = 'flex';
+                
+                if(cropper) cropper.destroy();
+                cropper = new Cropper(img, {
+                    viewMode: 1,
+                    dragMode: 'move',
+                    aspectRatio: mode === 'passport' ? 3.5/4.5 : NaN,
+                    autoCropArea: 0.9,
+                });
+            };
+            reader.readAsDataURL(currentFile);
+            e.target.value = ''; // Reset input
+        }
+
+        function cancelCrop() {
+            document.getElementById('cropper-modal').style.display = 'none';
+            if(cropper) cropper.destroy();
+        }
+
+        function finishCrop() {
+            const canvas = cropper.getCroppedCanvas();
+            document.getElementById('cropper-modal').style.display = 'none';
+            
+            if(currentMode === 'compress') {
+                document.getElementById('controls').style.display = 'block';
+                // Store cropped canvas for processing
+                window.croppedCanvas = canvas;
+                showToast('Image Cropped. Now configure settings.');
+            } else {
+                document.getElementById('pp-controls').style.display = 'block';
+                window.ppCanvas = canvas;
+            }
+        }
+
+        // --- FEATURE: DATE ON PHOTO & COMPRESS ---
+        document.getElementById('add-date').addEventListener('change', (e) => {
+            document.getElementById('date-input-div').style.display = e.target.checked ? 'block' : 'none';
+            // Set today as default
+            document.getElementById('photo-date').valueAsDate = new Date();
+        });
+
+        async function processImage() {
+            if(!window.croppedCanvas) return showToast('Please upload image first');
+            loader(true);
+
+            setTimeout(async () => {
+                try {
+                    // 1. Get Base Canvas
+                    let canvas = window.croppedCanvas;
+                    const ctx = canvas.getContext('2d');
+                    
+                    // 2. Add Date if requested
+                    if(document.getElementById('add-date').checked) {
+                        const dateVal = document.getElementById('photo-date').value;
+                        if(dateVal) {
+                            // Convert YYYY-MM-DD to DD-MM-YYYY
+                            const [y, m, d] = dateVal.split('-');
+                            const dateStr = `DOP: ${d}-${m}-${y}`;
+
+                            // Add white strip at bottom
+                            const stripH = canvas.height * 0.15; // 15% of height
+                            const fontSize = stripH * 0.6;
+                            
+                            // We need to create a new canvas to ensure we don't overwrite if resized later
+                            const newC = document.createElement('canvas');
+                            newC.width = canvas.width;
+                            newC.height = canvas.height;
+                            const nCtx = newC.getContext('2d');
+                            nCtx.drawImage(canvas, 0, 0);
+
+                            nCtx.fillStyle = 'white';
+                            nCtx.fillRect(0, newC.height - stripH, newC.width, stripH);
+                            
+                            nCtx.fillStyle = 'black';
+                            nCtx.font = `bold ${fontSize}px Arial`;
+                            nCtx.textAlign = 'center';
+                            nCtx.textBaseline = 'middle';
+                            nCtx.fillText(dateStr, newC.width/2, newC.height - (stripH/2));
+                            
+                            canvas = newC;
+                        }
+                    }
+
+                    // 3. Resize Logic (if dimensions specified)
+                    const wVal = document.getElementById('width-val').value;
+                    const unit = document.getElementById('dim-unit').value;
+                    
+                    if(wVal) {
+                        let targetWPx = 0;
+                        if(unit === 'px') targetWPx = parseInt(wVal);
+                        if(unit === 'cm') targetWPx = (parseFloat(wVal) / 2.54) * 300; // 300 DPI assumption
+                        if(unit === 'mm') targetWPx = (parseFloat(wVal) / 25.4) * 300;
+
+                        const scale = targetWPx / canvas.width;
+                        const targetHPx = canvas.height * scale;
+
+                        const rCanvas = document.createElement('canvas');
+                        rCanvas.width = targetWPx;
+                        rCanvas.height = targetHPx;
+                        rCanvas.getContext('2d').drawImage(canvas, 0, 0, targetWPx, targetHPx);
+                        canvas = rCanvas;
+                    }
+
+                    // 4. Compression
+                    const targetKB = parseInt(document.getElementById('target-kb').value);
+                    const format = document.getElementById('format').value;
+                    
+                    let quality = 0.9;
+                    let dataUrl = canvas.toDataURL(format, quality);
+                    
+                    // Simple binary search for size
+                    let min = 0, max = 1, attempt = 0;
+                    while(attempt < 10) {
+                        const head = 'data:' + format + ';base64,';
+                        const sizeKB = Math.round((dataUrl.length - head.length) * 3/4) / 1024;
+                        
+                        if(Math.abs(sizeKB - targetKB) < 5 || (sizeKB < targetKB && quality > 0.9)) break;
+                        
+                        if(sizeKB > targetKB) {
+                            max = quality;
+                            quality = (min + max) / 2;
+                        } else {
+                            min = quality;
+                            quality = (min + max) / 2;
+                        }
+                        dataUrl = canvas.toDataURL(format, quality);
+                        attempt++;
+                    }
+
+                    // Display
+                    const finalImg = document.getElementById('final-img');
+                    finalImg.src = dataUrl;
+                    
+                    const head = 'data:' + format + ';base64,';
+                    const finalSize = (Math.round((dataUrl.length - head.length) * 3/4) / 1024).toFixed(1);
+                    document.getElementById('size-stat').innerText = `Final Size: ${finalSize} KB`;
+                    
+                    const dl = document.getElementById('download-link');
+                    dl.href = dataUrl;
+                    dl.download = `ShibuHelper_${Date.now()}.${format === 'image/jpeg' ? 'jpg' : 'png'}`;
+                    
+                    document.getElementById('result-area').style.display = 'block';
+                    loader(false);
+                    
+                } catch(e) {
+                    alert('Error: ' + e.message);
+                    loader(false);
+                }
+            }, 100);
+        }
+
+        // --- FEATURE: PASSPORT SHEET ---
+        function generatePassportSheet() {
+            if(!window.ppCanvas) return;
+            loader(true);
+
+            setTimeout(() => {
+                const type = document.getElementById('pp-paper').value;
+                const photoCanvas = window.ppCanvas;
+                
+                // Configs (at 300 DPI)
+                const configs = {
+                    '4x6': { w: 1200, h: 1800, rows: 4, cols: 2, gap: 30 },
+                    'a4': { w: 2480, h: 3508, rows: 7, cols: 5, gap: 30 }
+                };
+                const conf = configs[type];
+
+                const sheet = document.createElement('canvas');
+                sheet.width = conf.w;
+                sheet.height = conf.h;
+                const ctx = sheet.getContext('2d');
+                
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, sheet.width, sheet.height);
+
+                // Target Photo Size (35x45mm @ 300dpi = 413x531px)
+                const pw = 413;
+                const ph = 531;
+
+                // Calculate Margins to center grid
+                const gridW = (conf.cols * pw) + ((conf.cols - 1) * conf.gap);
+                const gridH = (conf.rows * ph) + ((conf.rows - 1) * conf.gap);
+                const startX = (conf.w - gridW) / 2;
+                const startY = (conf.h - gridH) / 2;
+
+                for(let r=0; r<conf.rows; r++) {
+                    for(let c=0; c<conf.cols; c++) {
+                        const x = startX + c*(pw+conf.gap);
+                        const y = startY + r*(ph+conf.gap);
+                        
+                        ctx.drawImage(photoCanvas, x, y, pw, ph);
+                        ctx.strokeStyle = '#cccccc';
+                        ctx.strokeRect(x, y, pw, ph); // Cut guides
+                    }
+                }
+
+                const url = sheet.toDataURL('image/jpeg', 0.9);
+                document.getElementById('pp-img-out').src = url;
+                document.getElementById('pp-dl').href = url;
+                document.getElementById('pp-dl').download = `Passport_Sheet_${type}.jpg`;
+                document.getElementById('pp-result').style.display = 'block';
+                loader(false);
+            }, 100);
+        }
+
+        // --- FEATURE: SIGNATURE CLEANER ---
+        document.getElementById('sign-input').addEventListener('change', function(e) {
+            if(e.target.files[0]) {
+                loader(true);
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0);
+                        
+                        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        const data = imageData.data;
+                        
+                        // Simple threshold filter
+                        for(let i=0; i < data.length; i+=4) {
+                            const avg = (data[i] + data[i+1] + data[i+2]) / 3;
+                            if(avg > 150) { // White background
+                                data[i+3] = 0; // Alpha 0
+                            } else {
+                                // Make ink black/dark blue
+                                data[i] = data[i] * 0.5;
+                                data[i+1] = data[i+1] * 0.5;
+                                data[i+2] = data[i+2] * 0.5;
+                            }
+                        }
+                        
+                        ctx.putImageData(imageData, 0, 0);
+                        const url = canvas.toDataURL('image/png');
+                        document.getElementById('sign-out').src = url;
+                        document.getElementById('sign-dl').href = url;
+                        document.getElementById('sign-result').style.display = 'block';
+                        loader(false);
+                    };
+                    img.src = evt.target.result;
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+
+        // --- FEATURE: IMAGE TO PDF ---
+        let pdfFiles = [];
+        document.getElementById('pdf-input').addEventListener('change', (e) => {
+            pdfFiles = Array.from(e.target.files);
+            document.getElementById('pdf-info').innerText = `${pdfFiles.length} photos selected`;
+            document.getElementById('pdf-info').style.display = 'block';
+        });
+
+        async function createPDF() {
+            if(pdfFiles.length === 0) return showToast('Select images first');
+            loader(true);
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            for(let i=0; i<pdfFiles.length; i++) {
+                if(i > 0) doc.addPage();
+                const data = await readFileAsDataURL(pdfFiles[i]);
+                const props = doc.getImageProperties(data);
+                
+                // Fit to A4
+                const pWidth = doc.internal.pageSize.getWidth();
+                const pHeight = doc.internal.pageSize.getHeight();
+                const ratio = Math.min(pWidth/props.width, pHeight/props.height);
+                const w = props.width * ratio * 0.9;
+                const h = props.height * ratio * 0.9;
+                
+                doc.addImage(data, 'JPEG', (pWidth-w)/2, (pHeight-h)/2, w, h);
+            }
+            
+            doc.save("ShibuHelper_Docs.pdf");
+            loader(false);
+        }
+
+        function readFileAsDataURL(file) {
+            return new Promise(resolve => {
+                const reader = new FileReader();
+                reader.onload = e => resolve(e.target.result);
+                reader.readAsDataURL(file);
+            });
+        }
+    </script>
+</body>
+</html>
